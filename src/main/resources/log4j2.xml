@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration monitorInterval="60">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="%highlight{%d %5p [%t] (%F:%L) - %m%n}{FATAL=Bright Red, ERROR=Bright Magenta, WARN=Bright Yellow,
+                    INFO=Bright Green, DEBUG=Bright Cyan, TRACE=Bright White}"/>
+        </Console>
+
+        <RollingFile name="RollingFile" fileName="activiti-events.log"
+                     filePattern="logs/$${date:yyyy-MM}/activiti-events-%d{MM-dd-yyyy}-%i.log.gz"
+                     immediateFlush="true" append="true">
+            <PatternLayout pattern="%d %5p [%t] (%F:%L) - %m%n"/>
+            <SizeBasedTriggeringPolicy size="50 MB"/>
+            <DefaultRolloverStrategy max="15"/>
+        </RollingFile>
+
+
+        <RollingFile name="OperatorRollingFile" fileName="operatorfile.log"
+                     filePattern="logs/$${date:yyyy-MM}/operatorfile-%d{MM-dd-yyyy}-%i.log" immediateFlush="true" append="true">
+            <PatternLayout pattern="%d %5p [%t] (%F:%L) - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="15"/>
+        </RollingFile>
+
+        <Async name="Async" includeLocation="true">
+            <AppenderRef ref="RollingFile"/>
+        </Async>
+    </Appenders>
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="RollingFile"/>
+            <AppenderRef ref="Console"/>
+        </Root>
+
+        <Logger name="operatorLog" additivity="false" level="info">
+            <AppenderRef ref="OperatorRollingFile"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <Logger name="org.springframework.jdbc.core" additivity="false" level="debug">
+            <AppenderRef ref="RollingFile"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="org.activiti" additivity="false" level="debug">
+            <AppenderRef ref="RollingFile"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+
+    </Loggers>
+</Configuration>
